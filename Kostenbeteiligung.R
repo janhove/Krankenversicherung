@@ -136,8 +136,6 @@ k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten)
 (reduktionsfaktor1200 <- 1 - k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten))
 1 - reduktionsfaktor1200 / reduktionsfaktor0
 
-#' **Noch korrigieren: Die 7.4% Kostenbeteiligung muss man noch berücksichtigen.** 
-
 #' # Aufgabe 3
 decum <- function(x) {
   x - c(0, x[-length(x)])
