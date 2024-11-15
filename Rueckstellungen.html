@@ -11,7 +11,7 @@
 
 <meta name="author" content="Jan Vanhove" />
 
-<meta name="date" content="2024-11-14" />
+<meta name="date" content="2024-11-15" />
 
 <title>Aufgabenserie Rückstellungen</title>
 
@@ -2835,7 +2835,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Aufgabenserie Rückstellungen</h1>
 <h4 class="author">Jan Vanhove</h4>
-<h4 class="date">2024-11-14</h4>
+<h4 class="date">2024-11-15</h4>
 
 </div>
 
@@ -2952,8 +2952,9 @@ abgerechnet.</li>
 <p><strong>Antwort:</strong> Berechne nochmals die <span class="math inline">\(\varphi\)</span>-Werte:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>(phis <span class="ot">&lt;-</span> M <span class="sc">|&gt;</span> <span class="fu">shift_left</span>() <span class="sc">|&gt;</span> <span class="fu">cum_row</span>() <span class="sc">|&gt;</span> <span class="fu">phi</span>())</span></code></pre></div>
 <pre><code>## [1]       NA 5.760347 1.334330 1.045760</code></pre>
-<p>Wir erwarten also, dass die Leistungen aus einem bestimmten Monat
-sich wie folgt auf die Folgemonate verteilen (Proportionen):</p>
+<p><strong>Falsch, korrigieren:</strong> Wir erwarten also, dass die
+Leistungen aus einem bestimmten Monat sich wie folgt auf die Folgemonate
+verteilen (Proportionen):</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>phis[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>(props <span class="ot">&lt;-</span> phis <span class="sc">/</span> <span class="fu">sum</span>(phis))</span></code></pre></div>
 <pre><code>## [1] 0.1094040 0.6302047 0.1459810 0.1144103</code></pre>

@@ -109,7 +109,7 @@ chain_ladder <- function(M) {
 #' **Antwort:** Berechne nochmals die $\varphi$-Werte:
 (phis <- M |> shift_left() |> cum_row() |> phi())
 
-#' Wir erwarten also, dass die Leistungen aus einem bestimmten Monat sich wie 
+#' **Falsch, korrigieren:** Wir erwarten also, dass die Leistungen aus einem bestimmten Monat sich wie 
 #' folgt auf die Folgemonate verteilen (Proportionen):
 phis[1] <- 1
 (props <- phis / sum(phis))
