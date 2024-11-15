@@ -33,15 +33,15 @@
 #' Ich gehe davon aus, dass $B \equiv 7$ gemeint ist (statt $\textrm{Var}(B) > 0$). 
 #' Sonst ergibt der Rest nicht wahnsinnig viel Sinn.
 #' 
-#' Tschebyscheff: Setze $k = 1/\sqrt{20}$ und erhalte
+#' Tschebyscheff: Setze $k = \sqrt{20}$ und erhalte
 
-k <- 1 / sqrt(20)
+k <- sqrt(20)
 L <- 50000
-L * 2100 + c(-1, 1) * k * sqrt(L) * 700
+L * 2100 + c(-1, 1) * k * sqrt(L * 700)
 
 #' Also 
 #' 
-#' $$\mathbb{P}\left(S \ni [104965000, 105035000]\right) \geq 0.95.$$
+#' $$\mathbb{P}\left(S \ni [104973542, 105026458]\right) \geq 0.95.$$
 #' 
 #' Mit einer Normalverteilung: $\mathbb{E}(S) = L\mathbb{E}(s) = 50000 \cdot 2100$
 #' und
