@@ -122,6 +122,8 @@ props[1] * 1e6
 #' (Total mit den Vormonaten: 1'045'132.)
 props[2] * 1e6 + props[1] * 11e5
 
+#' (c) Cf. GLM-Implementierung.
+
 #' # Rückstellungen mit Benktander-Hovinen
 #' Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 154
 #' die Rückstellungen gemäss Bornhuetter-Ferguson und gemäss Benktander-Hovinen.
@@ -210,6 +212,8 @@ X_mack <- S_mack |> decum_row() |> shift_right()
 X_mack[2:6, 7:11]
 sum(X_mack[2:6, 7:11], na.rm = TRUE) # Gesamtrückstellungen: 11'696
 
+#' **Irgendwo muss ich einen kleinen Fehler gemacht haben. Die tatsächliche Antwort ist 11'706. Vllt. liegt's daran, dass man die $\alpha^{LD}$-Werte genauer berechnen kann.**
+
 #' # Rückstellungsberechnung mit erweitertem Bornhuetter-Ferguson-Verfahren
 #' **Chain Ladder:**
 S <- rbind(
@@ -224,6 +228,7 @@ gamma <- c(0.6, 0.9, 1) # gegeben
 bf(S, gamma_cl, alpha_ld) |> 
   decum_row() |> 
   shift_right()
+#' Auch hier irgendwo noch ein Fehler zu korrigieren.
 
 #' **Panning**
 

@@ -2966,13 +2966,11 @@ Kosten abgerechnet. (Total mit den Vormonaten: 1’000’666.)</p>
 mit den Vormonaten: 1’045’132.)</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>props[<span class="dv">2</span>] <span class="sc">*</span> <span class="fl">1e6</span> <span class="sc">+</span> props[<span class="dv">1</span>] <span class="sc">*</span> <span class="fl">11e5</span></span></code></pre></div>
 <pre><code>## [1] 750549</code></pre>
-</div>
-<div id="rückstellungen-mit-benktander-hovinen" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Rückstellungen mit
-Benktander-Hovinen</h1>
-<p>Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 154 die
-Rückstellungen gemäss Bornhuetter-Ferguson und gemäss
-Benktander-Hovinen.</p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Cf. GLM-Implementierung. # Rückstellungen mit Benktander-Hovinen
+Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 154 die Rückstellungen
+gemäss Bornhuetter-Ferguson und gemäss Benktander-Hovinen.</li>
+</ol>
 <p><strong>Antwort:</strong> Tabelle 8w (S. 160) enthält bereits die
 kumulativen Rückstellungen. Es reicht also, diese zu dekumulieren. Für
 Benktander-Hovinen kann man den Bornhuetter-Ferguson-Algorithmus
@@ -3042,8 +3040,8 @@ Ich erhalte die</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">sum</span>(X[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">11</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Gesamtrückstellungen: 10&#39;467</span></span></code></pre></div>
 <pre><code>## [1] 10466.7</code></pre>
 </div>
-<div id="rückstellungen-nach-macks-methode" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Rückstellungen nach
+<div id="rückstellungen-nach-macks-methode" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Rückstellungen nach
 Mack’s Methode</h1>
 <p>Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 159 (Tabelle 8t)
 die Rückstellungen nach Mack’s Methode.</p>
@@ -3096,11 +3094,10 @@ die Rückstellungen nach Mack’s Methode.</p>
 ## 6 1958.3398 1244.9488 1161.5849 737.7089 305.1999</code></pre>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">sum</span>(X_mack[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">11</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Gesamtrückstellungen: 11&#39;696</span></span></code></pre></div>
 <pre><code>## [1] 11696.13</code></pre>
-</div>
-<div id="rückstellungsberechnung-mit-erweitertem-bornhuetter-ferguson-verfahren" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Rückstellungsberechnung
-mit erweitertem Bornhuetter-Ferguson-Verfahren</h1>
-<p><strong>Chain Ladder:</strong></p>
+<p><strong>Irgendwo muss ich einen kleinen Fehler gemacht haben. Die
+tatsächliche Antwort ist 11’706. Vllt. liegt’s daran, dass man die <span class="math inline">\(\alpha^{LD}\)</span>-Werte genauer berechnen
+kann.</strong> # Rückstellungsberechnung mit erweitertem
+Bornhuetter-Ferguson-Verfahren <strong>Chain Ladder:</strong></p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>S <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
 <span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">150</span>, <span class="dv">180</span>),</span>
 <span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>  <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">120</span>, <span class="dv">170</span>),</span>
@@ -3120,7 +3117,8 @@ mit erweitertem Bornhuetter-Ferguson-Verfahren</h1>
 ## 1 100  50  30       NA       NA
 ## 2  NA 120  50 34.00000       NA
 ## 3  NA  NA 110 81.81818 52.36364</code></pre>
-<p><strong>Panning</strong></p>
+<p>Auch hier irgendwo noch ein Fehler zu korrigieren.
+<strong>Panning</strong></p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="co"># S. 158</span></span>
 <span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>gamma_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(beta) {</span>
 <span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a>  <span class="fu">cumsum</span>(beta) <span class="sc">/</span> <span class="fu">sum</span>(beta)</span>
@@ -3155,8 +3153,8 @@ mit erweitertem Bornhuetter-Ferguson-Verfahren</h1>
 ## 2  NA 120  50 36.00000 NA
 ## 3  NA  NA 110 49.59016 33</code></pre>
 </div>
-<div id="rückstellungsverfahren-mit-erweitertem-bornhuetter-ferguson-verfahren" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Rückstellungsverfahren
+<div id="rückstellungsverfahren-mit-erweitertem-bornhuetter-ferguson-verfahren" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Rückstellungsverfahren
 mit erweitertem Bornhuetter-Ferguson-Verfahren</h1>
 <p>Bissl zu mühsam.</p>
 </div>
