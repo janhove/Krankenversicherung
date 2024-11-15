@@ -30,6 +30,9 @@ k_avg <- function(e, s, f, sb, m) {
   }
   avg
 }
+kobe_anteil <- function(e, s, f, sb, m) {
+  k_avg(e, s, f, sb, m) / sum(e * s)
+}
 
 #' (1) Die Gesamtkosten betragen $323K$, wo $K$ die Anzahl Erkrankter ist.
 #' Alternativ, $258.4L$, wo $L$ die Anzahl Versicherter ist.
@@ -63,15 +66,17 @@ sum((2/3 * selbstbehalt_300 + 1/3 * selbstbehalt_500) * anteil)
 # Kosten
 k_avg(anteil, kosten, Inf, 1, 0)
 # Selbstbehalt
-2/3*k_avg(anteil, kosten, 300, 0.1, 700) + 1/3*k_avg(anteil, kosten, 500, 0.1, 700)
-#' 
+2/3 * k_avg(anteil, kosten, 300, 0.1, 700) + 1/3 * k_avg(anteil, kosten, 500, 0.1, 700)
+2/3 * kobe_anteil(anteil, kosten, 300, 0.1, 700) + 1/3 * kobe_anteil(anteil, kosten, 500, 0.1, 700)
+
 #' (2) Vgl. Formeln 34--36. 
 #' Mit Franchise 300 sollte man eine Prämie, die 29\% der fiktiven
 #' Grundprämie $p$ beträgt, zahlen, mit Franchise 500 eine, die 11\% von $p$ beträgt.
-#' Also sollte die Prämie für diejenigen mit Franchise 500 $11/29 = 38\%$ der Prämie
+#' Also sollte die Prämie für diejenigen mit Franchise 500 $39\%$ der Prämie
 #' derjenigen mit Franchise 300 betragen. (Beide überschreiten 50%? Wie weiter?)
 (reduktionsfaktor300 <- 1 - k_avg(anteil, kosten, 300, 0.1, 700)/gesamtkosten)
 (reduktionsfaktor500 <- 1 - k_avg(anteil, kosten, 500, 0.1, 700)/gesamtkosten)
+reduktionsfaktor500 / reduktionsfaktor300
 
 #' # Aufgabe 2
 #' Zur Kontrolle:
@@ -100,10 +105,14 @@ sum(kobe_total) # Gesamtkobe
 k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten)
 
 #'
-#' (d) Eine Verbilligung von 36.6\% (cf. Anteil Kobe am Leistungsvolumen).
-(rabatt1200 <- k_avg(anteil, kosten, 1200, 0.1, 400)/sum(anteil * kosten))
+#' (d) Verglichen mit einer Grundprämie $p$ (fiktive Variante ohne Selbsterhalt) sollen
+#' die Prämien 92% bzw. 63% betragen. Also gewährt man die Variante mit Franchise 1200
+#' einen Rabatt von 32% verglichen zur Variante mit Franchise 0.
+(reduktionsfaktor0 <- 1 - k_avg(anteil, kosten, 0, 0.1, 400) / sum(anteil * kosten))
+(reduktionsfaktor1200 <- 1 - k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten))
+1 - reduktionsfaktor1200 / reduktionsfaktor0
 
-#' (e) Wie folgt. Totalkosten: 3'900'000. Gesamtkobe: 1'372'000. Kobeanteil und Rabatt: 35%.
+#' (e) Wie folgt. Totalkosten: 3'900'000. Gesamtkobe: 1'372'000. Kobeanteil: 35%. Rabatt: 30%.
 kosten <- kosten + 500
 anzahl <- anteil * 1000
 franchise <- pmin(1200, kosten)
@@ -123,7 +132,11 @@ tibble(
 sum(anzahl * kosten) # Gesamtkosten
 sum(kobe_total) # Gesamtkobe
 k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten)
-(rabatt1200 <- k_avg(anteil, kosten, 1200, 0.1, 400)/sum(anteil * kosten))
+(reduktionsfaktor0 <- 1 - k_avg(anteil, kosten, 0, 0.1, 400) / sum(anteil * kosten))
+(reduktionsfaktor1200 <- 1 - k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten))
+1 - reduktionsfaktor1200 / reduktionsfaktor0
+
+#' **Noch korrigieren: Die 7.4% Kostenbeteiligung muss man noch berücksichtigen.** 
 
 #' # Aufgabe 3
 decum <- function(x) {
@@ -139,10 +152,10 @@ d <- read_table("serie-241108_aufgabe-3.txt") |>
     )) 
 
 #' (a) Der Kobeanteil beträgt 16% des Leistungsvolumens.
-k_avg(d$prop_erkr, d$avg_kosten, 400, 0.1, 700) / sum(d$prop_erkr * d$avg_kosten)
+kobe_anteil(d$prop_erkr, d$avg_kosten, 400, 0.1, 700)
 #' (b) Der Kobeanteil steigt um 2 Prozentpunkte auf 18% des Leistungsvolumens.
-k_avg(d$prop_erkr, d$avg_kosten, 500, 0.1, 700) / sum(d$prop_erkr * d$avg_kosten)
+kobe_anteil(d$prop_erkr, d$avg_kosten, 500, 0.1, 700)
 #' (c) Der Kobeanteil steigt um 2.5 Prozentpunkte auf 18.5% des Leistungsvolumens.
-k_avg(d$prop_erkr, d$avg_kosten, 400, 0.2, 700) / sum(d$prop_erkr * d$avg_kosten)
+kobe_anteil(d$prop_erkr, d$avg_kosten, 400, 0.2, 700)
 #' (d) Der Kobeanteil senkt um einen Prozentpunkt auf 15% des Leistungsvolumens.
-k_avg(d$prop_erkr, 1.1 * d$avg_kosten, 400, 0.1, 700) / sum(d$prop_erkr * 1.1 * d$avg_kosten)
+kobe_anteil(d$prop_erkr, 1.1 * d$avg_kosten, 400, 0.1, 700)
