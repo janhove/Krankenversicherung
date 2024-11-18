@@ -11,7 +11,7 @@
 
 <meta name="author" content="Jan Vanhove" />
 
-<meta name="date" content="2024-11-15" />
+<meta name="date" content="2024-11-18" />
 
 <title>Aufgabenserie Kostenbeteiligung</title>
 
@@ -2835,7 +2835,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Aufgabenserie Kostenbeteiligung</h1>
 <h4 class="author">Jan Vanhove</h4>
-<h4 class="date">2024-11-15</h4>
+<h4 class="date">2024-11-18</h4>
 
 </div>
 
@@ -2903,8 +2903,8 @@ Sfr, also gilt für alle einen Selbstbehalt von 10%.</p>
 <p>Die totale Kostenbeteiligung beträgt also <span class="math inline">\(247.7K\)</span> oder <span class="math inline">\(198.16L\)</span>.. Der Anteil der
 Kostenbeteiligung ist daher <span class="math inline">\(247.7/323 =
 198.16/258.4 \approx 77\%\)</span>.</p>
-<p>Mit der Funktion <code>k_avg()</code> kommt man zum gleichen
-Resultat:</p>
+<p>Mit den Funktionen <code>k_avg()</code> und
+<code>kobe_anteil()</code> kommt man zum gleichen Resultat:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Kosten</span></span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">k_avg</span>(anteil, kosten, <span class="cn">Inf</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span></code></pre></div>
 <pre><code>## [1] 258.4</code></pre>
@@ -2918,12 +2918,11 @@ Resultat:</p>
 29% der fiktiven Grundprämie <span class="math inline">\(p\)</span>
 beträgt, zahlen, mit Franchise 500 eine, die 11% von <span class="math inline">\(p\)</span> beträgt. Also sollte die Prämie für
 diejenigen mit Franchise 500 <span class="math inline">\(39\%\)</span>
-der Prämie derjenigen mit Franchise 300 betragen. (Beide überschreiten
-50%? Wie weiter?)</li>
+der Prämie derjenigen mit Franchise 300 betragen.</li>
 </ol>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>(reduktionsfaktor300 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">k_avg</span>(anteil, kosten, <span class="dv">300</span>, <span class="fl">0.1</span>, <span class="dv">700</span>)<span class="sc">/</span>gesamtkosten)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>(reduktionsfaktor300 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">kobe_anteil</span>(anteil, kosten, <span class="dv">300</span>, <span class="fl">0.1</span>, <span class="dv">700</span>))</span></code></pre></div>
 <pre><code>## [1] 0.2925697</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>(reduktionsfaktor500 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">k_avg</span>(anteil, kosten, <span class="dv">500</span>, <span class="fl">0.1</span>, <span class="dv">700</span>)<span class="sc">/</span>gesamtkosten)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>(reduktionsfaktor500 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">kobe_anteil</span>(anteil, kosten, <span class="dv">500</span>, <span class="fl">0.1</span>, <span class="dv">700</span>))</span></code></pre></div>
 <pre><code>## [1] 0.1142415</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>reduktionsfaktor500 <span class="sc">/</span> reduktionsfaktor300</span></code></pre></div>
 <pre><code>## [1] 0.3904762</code></pre>
@@ -3016,7 +3015,7 @@ Leistungsvolumen beträgt 36.6%.</p>
 <pre><code>## [1] 3400000</code></pre>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">sum</span>(kobe_total) <span class="co"># Gesamtkobe</span></span></code></pre></div>
 <pre><code>## [1] 1246000</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">k_avg</span>(anteil, kosten, <span class="dv">1200</span>, <span class="fl">0.1</span>, <span class="dv">400</span>) <span class="sc">/</span> <span class="fu">sum</span>(anteil <span class="sc">*</span> kosten)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">kobe_anteil</span>(anteil, kosten, <span class="dv">1200</span>, <span class="fl">0.1</span>, <span class="dv">400</span>)</span></code></pre></div>
 <pre><code>## [1] 0.3664706</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Verglichen mit einer Grundprämie <span class="math inline">\(p\)</span> (fiktive Variante ohne Selbsterhalt)
@@ -3114,16 +3113,17 @@ Kobeanteil: 35%. Rabatt: 30%.</li>
 <pre><code>## [1] 3900000</code></pre>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="fu">sum</span>(kobe_total) <span class="co"># Gesamtkobe</span></span></code></pre></div>
 <pre><code>## [1] 1372000</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="fu">k_avg</span>(anteil, kosten, <span class="dv">1200</span>, <span class="fl">0.1</span>, <span class="dv">400</span>) <span class="sc">/</span> <span class="fu">sum</span>(anteil <span class="sc">*</span> kosten)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="fu">kobe_anteil</span>(anteil, kosten, <span class="dv">1200</span>, <span class="fl">0.1</span>, <span class="dv">400</span>)</span></code></pre></div>
 <pre><code>## [1] 0.3517949</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a>(reduktionsfaktor0 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">k_avg</span>(anteil, kosten, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="dv">400</span>) <span class="sc">/</span> <span class="fu">sum</span>(anteil <span class="sc">*</span> kosten))</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a>(reduktionsfaktor0 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">kobe_anteil</span>(anteil, kosten, <span class="dv">0</span>, <span class="fl">0.1</span>, <span class="dv">400</span>))</span></code></pre></div>
 <pre><code>## [1] 0.9282051</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>(reduktionsfaktor1200 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">k_avg</span>(anteil, kosten, <span class="dv">1200</span>, <span class="fl">0.1</span>, <span class="dv">400</span>) <span class="sc">/</span> <span class="fu">sum</span>(anteil <span class="sc">*</span> kosten))</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>(reduktionsfaktor1200 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">kobe_anteil</span>(anteil, kosten, <span class="dv">1200</span>, <span class="fl">0.1</span>, <span class="dv">400</span>))</span></code></pre></div>
 <pre><code>## [1] 0.6482051</code></pre>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> reduktionsfaktor1200 <span class="sc">/</span> reduktionsfaktor0</span></code></pre></div>
 <pre><code>## [1] 0.3016575</code></pre>
-<p><strong>Noch korrigieren: Die 7.4% Kostenbeteiligung muss man noch
-berücksichtigen.</strong> # Aufgabe 3</p>
+</div>
+<div id="aufgabe-3" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Aufgabe 3</h1>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a>decum <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a>  x <span class="sc">-</span> <span class="fu">c</span>(<span class="dv">0</span>, x[<span class="sc">-</span><span class="fu">length</span>(x)])</span>
 <span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a>}</span>

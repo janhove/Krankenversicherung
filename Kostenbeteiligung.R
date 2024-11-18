@@ -62,7 +62,7 @@ sum((2/3 * selbstbehalt_300 + 1/3 * selbstbehalt_500) * anteil)
 #' Die totale Kostenbeteiligung beträgt also $247.7K$ oder $198.16L$..
 #' Der Anteil der Kostenbeteiligung ist daher $247.7/323 = 198.16/258.4 \approx 77\%$.
 #' 
-#' Mit der Funktion `k_avg()` kommt man zum gleichen Resultat:
+#' Mit den Funktionen `k_avg()` und `kobe_anteil()` kommt man zum gleichen Resultat:
 # Kosten
 k_avg(anteil, kosten, Inf, 1, 0)
 # Selbstbehalt
@@ -73,9 +73,9 @@ k_avg(anteil, kosten, Inf, 1, 0)
 #' Mit Franchise 300 sollte man eine Prämie, die 29\% der fiktiven
 #' Grundprämie $p$ beträgt, zahlen, mit Franchise 500 eine, die 11\% von $p$ beträgt.
 #' Also sollte die Prämie für diejenigen mit Franchise 500 $39\%$ der Prämie
-#' derjenigen mit Franchise 300 betragen. (Beide überschreiten 50%? Wie weiter?)
-(reduktionsfaktor300 <- 1 - k_avg(anteil, kosten, 300, 0.1, 700)/gesamtkosten)
-(reduktionsfaktor500 <- 1 - k_avg(anteil, kosten, 500, 0.1, 700)/gesamtkosten)
+#' derjenigen mit Franchise 300 betragen.
+(reduktionsfaktor300 <- 1 - kobe_anteil(anteil, kosten, 300, 0.1, 700))
+(reduktionsfaktor500 <- 1 - kobe_anteil(anteil, kosten, 500, 0.1, 700))
 reduktionsfaktor500 / reduktionsfaktor300
 
 #' # Aufgabe 2
@@ -102,7 +102,7 @@ tibble(
 ) |> knitr::kable()
 sum(anzahl * kosten) # Gesamtkosten
 sum(kobe_total) # Gesamtkobe
-k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten)
+kobe_anteil(anteil, kosten, 1200, 0.1, 400)
 
 #'
 #' (d) Verglichen mit einer Grundprämie $p$ (fiktive Variante ohne Selbsterhalt) sollen
@@ -112,7 +112,10 @@ k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten)
 (reduktionsfaktor1200 <- 1 - k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten))
 1 - reduktionsfaktor1200 / reduktionsfaktor0
 
-#' (e) Wie folgt. Totalkosten: 3'900'000. Gesamtkobe: 1'372'000. Kobeanteil: 35%. Rabatt: 30%.
+#' (e) Wie folgt. Totalkosten: 3'900'000. 
+#' Gesamtkobe: 1'372'000. 
+#' Kobeanteil: 35%. 
+#' Rabatt: 30%.
 kosten <- kosten + 500
 anzahl <- anteil * 1000
 franchise <- pmin(1200, kosten)
@@ -131,9 +134,9 @@ tibble(
 ) |> knitr::kable()
 sum(anzahl * kosten) # Gesamtkosten
 sum(kobe_total) # Gesamtkobe
-k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten)
-(reduktionsfaktor0 <- 1 - k_avg(anteil, kosten, 0, 0.1, 400) / sum(anteil * kosten))
-(reduktionsfaktor1200 <- 1 - k_avg(anteil, kosten, 1200, 0.1, 400) / sum(anteil * kosten))
+kobe_anteil(anteil, kosten, 1200, 0.1, 400)
+(reduktionsfaktor0 <- 1 - kobe_anteil(anteil, kosten, 0, 0.1, 400))
+(reduktionsfaktor1200 <- 1 - kobe_anteil(anteil, kosten, 1200, 0.1, 400))
 1 - reduktionsfaktor1200 / reduktionsfaktor0
 
 #' # Aufgabe 3
