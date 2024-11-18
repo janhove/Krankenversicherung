@@ -3076,7 +3076,7 @@ die Rückstellungen nach Mack’s Methode.</p>
 <span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a>}</span>
 <span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a>mack <span class="ot">&lt;-</span> <span class="cf">function</span>(S, pi) {</span>
 <span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a>  X <span class="ot">&lt;-</span> S <span class="sc">|&gt;</span> <span class="fu">decum_row</span>()</span>
-<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a>  <span class="co"># Vermutlich ist zeta gemeint, steht aber ς (= sigma im Coda).</span></span>
+<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a>  <span class="co"># Vermutlich ist zeta (ζ) gemeint, steht aber ς (= sigma im Coda).</span></span>
 <span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a>  sigma_ad <span class="ot">&lt;-</span> <span class="fu">colSums</span>(X, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">rev</span>(<span class="fu">cumsum</span>(pi)) <span class="co"># S. 158</span></span>
 <span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a>  gamma_ad <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(sigma_ad) <span class="sc">/</span> <span class="fu">sum</span>(sigma_ad)           <span class="co"># S. 159</span></span>
 <span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a>  alpha_ld <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(X, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">rev</span>(gamma_ad)   <span class="co"># S. 161</span></span>
@@ -3116,72 +3116,94 @@ mit erweitertem Bornhuetter-Ferguson-Verfahren</h1>
 <span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">120</span>, <span class="dv">170</span>),</span>
 <span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>  <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">110</span>)</span>
 <span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">shift_left</span>()</span>
-<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">0.9</span>, <span class="dv">1</span>) <span class="co"># gegeben</span></span>
-<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a>(phi_cl <span class="ot">&lt;-</span> <span class="fu">phi</span>(S))      <span class="co"># S. 156</span></span></code></pre></div>
-<pre><code>## [1]       NA 1.454545 1.200000</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="co"># (gamma_cl &lt;- c(rev(1/cumprod(rev(phi_cl)))[2:length(phi_cl)], 1)) # S. 157</span></span>
-<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>(gamma_cl <span class="ot">&lt;-</span> <span class="fu">c</span>((<span class="dv">1</span> <span class="sc">/</span> <span class="fu">cumprod</span>(<span class="fu">rev</span>(phi_cl[<span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(phi_cl)]))) <span class="sc">|&gt;</span> <span class="fu">rev</span>(), <span class="dv">1</span>))</span></code></pre></div>
-<pre><code>## [1] 0.5729167 0.8333333 1.0000000</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>(alpha_ld <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">apply</span>(S, <span class="dv">1</span>, max, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">rev</span>(gamma_cl))) <span class="co"># S. 161</span></span></code></pre></div>
-<pre><code>## [1] 192 204 180</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">bf</span>(S, gamma_cl, alpha_ld) <span class="sc">|&gt;</span> </span>
-<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a>  <span class="fu">shift_right</span>()</span>
-<span id="cb42-4"><a href="#cb42-4" tabindex="-1"></a>X</span></code></pre></div>
+<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>chain_ladder_bf <span class="ot">&lt;-</span> <span class="cf">function</span>(S) {</span>
+<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a>  phi_cl <span class="ot">&lt;-</span> <span class="fu">phi</span>(S) <span class="co"># S. 156</span></span>
+<span id="cb36-8"><a href="#cb36-8" tabindex="-1"></a>  gamma_cl <span class="ot">&lt;-</span> <span class="fu">c</span>((<span class="dv">1</span> <span class="sc">/</span> <span class="fu">cumprod</span>(<span class="fu">rev</span>(phi_cl[<span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(phi_cl)]))) <span class="sc">|&gt;</span> <span class="fu">rev</span>(), <span class="dv">1</span>) <span class="co"># S. 157</span></span>
+<span id="cb36-9"><a href="#cb36-9" tabindex="-1"></a>  alpha_ld <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">apply</span>(S, <span class="dv">1</span>, max, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">rev</span>(gamma_cl)) <span class="co"># S. 161</span></span>
+<span id="cb36-10"><a href="#cb36-10" tabindex="-1"></a>  <span class="fu">bf</span>(S, gamma_cl, alpha_ld)</span>
+<span id="cb36-11"><a href="#cb36-11" tabindex="-1"></a>}</span>
+<span id="cb36-12"><a href="#cb36-12" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">chain_ladder_bf</span>(S) <span class="sc">|&gt;</span> </span>
+<span id="cb36-13"><a href="#cb36-13" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb36-14"><a href="#cb36-14" tabindex="-1"></a>  <span class="fu">shift_right</span>()</span>
+<span id="cb36-15"><a href="#cb36-15" tabindex="-1"></a>X</span></code></pre></div>
 <pre><code>##     1   2   3      4  5
 ## 1 100  50  30     NA NA
 ## 2  NA 120  50 34.000 NA
 ## 3  NA  NA 110 46.875 30</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>X[, <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">|&gt;</span> <span class="fu">sum</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Rückstellungen</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>X[, <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">|&gt;</span> <span class="fu">sum</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Rückstellungen</span></span></code></pre></div>
 <pre><code>## [1] 110.875</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a><span class="co"># mit chain_ladder()</span></span>
-<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>S <span class="sc">|&gt;</span> </span>
-<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>  <span class="fu">chain_ladder</span>()</span></code></pre></div>
-<pre><code>##     1   2   3  4  5
-## 1 100  50  30 NA NA
-## 2  NA 120  50 34 NA
-## 3  NA  NA 110 50 32</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="co"># Ähnlich aber anders, weil gamma vorgegeben war.</span></span></code></pre></div>
 <p><strong>Panning</strong></p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="co"># S. 158</span></span>
-<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a>gamma_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(beta) {</span>
-<span id="cb49-3"><a href="#cb49-3" tabindex="-1"></a>  <span class="fu">cumsum</span>(beta) <span class="sc">/</span> <span class="fu">sum</span>(beta)</span>
-<span id="cb49-4"><a href="#cb49-4" tabindex="-1"></a>}</span>
-<span id="cb49-5"><a href="#cb49-5" tabindex="-1"></a><span class="co"># S. 157</span></span>
-<span id="cb49-6"><a href="#cb49-6" tabindex="-1"></a>beta_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb49-7"><a href="#cb49-7" tabindex="-1"></a>  ell <span class="ot">&lt;-</span> <span class="fu">ncol</span>(X)</span>
-<span id="cb49-8"><a href="#cb49-8" tabindex="-1"></a>  betas <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">length =</span> ell)</span>
-<span id="cb49-9"><a href="#cb49-9" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ell) {</span>
-<span id="cb49-10"><a href="#cb49-10" tabindex="-1"></a>    betas[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(X[<span class="dv">1</span><span class="sc">:</span>(ell<span class="sc">-</span>i<span class="sc">+</span><span class="dv">1</span>), i] <span class="sc">*</span> X[<span class="dv">1</span><span class="sc">:</span>(ell<span class="sc">-</span>i<span class="sc">+</span><span class="dv">1</span>), <span class="dv">1</span>]) <span class="sc">/</span> <span class="fu">sum</span>(X[<span class="dv">1</span><span class="sc">:</span>(ell<span class="sc">-</span>i<span class="sc">+</span><span class="dv">1</span>), <span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb49-11"><a href="#cb49-11" tabindex="-1"></a>  }</span>
-<span id="cb49-12"><a href="#cb49-12" tabindex="-1"></a>  betas</span>
-<span id="cb49-13"><a href="#cb49-13" tabindex="-1"></a>}</span>
-<span id="cb49-14"><a href="#cb49-14" tabindex="-1"></a><span class="co"># S. 164</span></span>
-<span id="cb49-15"><a href="#cb49-15" tabindex="-1"></a>alpha_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb49-16"><a href="#cb49-16" tabindex="-1"></a>  X[, <span class="dv">1</span>] <span class="sc">*</span> <span class="fu">sum</span>(<span class="fu">beta_pa</span>(X))</span>
-<span id="cb49-17"><a href="#cb49-17" tabindex="-1"></a>}</span>
-<span id="cb49-18"><a href="#cb49-18" tabindex="-1"></a>S <span class="sc">|&gt;</span> </span>
-<span id="cb49-19"><a href="#cb49-19" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb49-20"><a href="#cb49-20" tabindex="-1"></a>  <span class="fu">beta_pa</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb49-21"><a href="#cb49-21" tabindex="-1"></a>  <span class="fu">gamma_pa</span>()</span></code></pre></div>
-<pre><code>## [1] 0.5711610 0.8286517 1.0000000</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>S <span class="sc">|&gt;</span> </span>
-<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb51-3"><a href="#cb51-3" tabindex="-1"></a>  <span class="fu">alpha_pa</span>()</span></code></pre></div>
-<pre><code>## [1] 175.0820 210.0984 192.5902</code></pre>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="fu">bf</span>(S, <span class="fu">gamma_pa</span>(<span class="fu">beta_pa</span>(<span class="fu">decum_row</span>(S))), <span class="fu">alpha_pa</span>(<span class="fu">decum_row</span>(S))) <span class="sc">|&gt;</span> </span>
-<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>  <span class="fu">shift_right</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>panning <span class="ot">&lt;-</span> <span class="cf">function</span>(S) {</span>
+<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a>  <span class="co"># S. 158</span></span>
+<span id="cb40-3"><a href="#cb40-3" tabindex="-1"></a>  gamma_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(beta) {</span>
+<span id="cb40-4"><a href="#cb40-4" tabindex="-1"></a>    <span class="fu">cumsum</span>(beta) <span class="sc">/</span> <span class="fu">sum</span>(beta)</span>
+<span id="cb40-5"><a href="#cb40-5" tabindex="-1"></a>  }</span>
+<span id="cb40-6"><a href="#cb40-6" tabindex="-1"></a>  <span class="co"># S. 157</span></span>
+<span id="cb40-7"><a href="#cb40-7" tabindex="-1"></a>  beta_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb40-8"><a href="#cb40-8" tabindex="-1"></a>    ell <span class="ot">&lt;-</span> <span class="fu">ncol</span>(X)</span>
+<span id="cb40-9"><a href="#cb40-9" tabindex="-1"></a>    betas <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">length =</span> ell)</span>
+<span id="cb40-10"><a href="#cb40-10" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ell) {</span>
+<span id="cb40-11"><a href="#cb40-11" tabindex="-1"></a>      betas[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(X[<span class="dv">1</span><span class="sc">:</span>(ell<span class="sc">-</span>i<span class="sc">+</span><span class="dv">1</span>), i] <span class="sc">*</span> X[<span class="dv">1</span><span class="sc">:</span>(ell<span class="sc">-</span>i<span class="sc">+</span><span class="dv">1</span>), <span class="dv">1</span>]) <span class="sc">/</span> <span class="fu">sum</span>(X[<span class="dv">1</span><span class="sc">:</span>(ell<span class="sc">-</span>i<span class="sc">+</span><span class="dv">1</span>), <span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb40-12"><a href="#cb40-12" tabindex="-1"></a>    }</span>
+<span id="cb40-13"><a href="#cb40-13" tabindex="-1"></a>    betas</span>
+<span id="cb40-14"><a href="#cb40-14" tabindex="-1"></a>  }</span>
+<span id="cb40-15"><a href="#cb40-15" tabindex="-1"></a>  <span class="co"># S. 164</span></span>
+<span id="cb40-16"><a href="#cb40-16" tabindex="-1"></a>  alpha_pa <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb40-17"><a href="#cb40-17" tabindex="-1"></a>    X[, <span class="dv">1</span>] <span class="sc">*</span> <span class="fu">sum</span>(<span class="fu">beta_pa</span>(X))</span>
+<span id="cb40-18"><a href="#cb40-18" tabindex="-1"></a>  }</span>
+<span id="cb40-19"><a href="#cb40-19" tabindex="-1"></a>  <span class="fu">bf</span>(S, <span class="fu">gamma_pa</span>(<span class="fu">beta_pa</span>(<span class="fu">decum_row</span>(S))), <span class="fu">alpha_pa</span>(<span class="fu">decum_row</span>(S)))</span>
+<span id="cb40-20"><a href="#cb40-20" tabindex="-1"></a>}</span>
+<span id="cb40-21"><a href="#cb40-21" tabindex="-1"></a></span>
+<span id="cb40-22"><a href="#cb40-22" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">panning</span>(S) <span class="sc">|&gt;</span> </span>
+<span id="cb40-23"><a href="#cb40-23" tabindex="-1"></a>  <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb40-24"><a href="#cb40-24" tabindex="-1"></a>  <span class="fu">shift_right</span>()</span>
+<span id="cb40-25"><a href="#cb40-25" tabindex="-1"></a>X</span></code></pre></div>
 <pre><code>##     1   2   3        4  5
 ## 1 100  50  30       NA NA
 ## 2  NA 120  50 36.00000 NA
 ## 3  NA  NA 110 49.59016 33</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a>X[, <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">|&gt;</span> <span class="fu">sum</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Rückstellungen</span></span></code></pre></div>
+<pre><code>## [1] 118.5902</code></pre>
 </div>
 <div id="rückstellungsverfahren-mit-erweitertem-bornhuetter-ferguson-verfahren" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Rückstellungsverfahren
 mit erweitertem Bornhuetter-Ferguson-Verfahren</h1>
-<p>Bissl zu mühsam.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>S <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">150</span>, <span class="dv">180</span>),</span>
+<span id="cb44-3"><a href="#cb44-3" tabindex="-1"></a>  <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">120</span>, <span class="dv">170</span>),</span>
+<span id="cb44-4"><a href="#cb44-4" tabindex="-1"></a>  <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">110</span>)</span>
+<span id="cb44-5"><a href="#cb44-5" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">shift_left</span>()</span>
+<span id="cb44-6"><a href="#cb44-6" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">0.9</span>, <span class="dv">1</span>)</span>
+<span id="cb44-7"><a href="#cb44-7" tabindex="-1"></a>pis <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">185</span>, <span class="dv">205</span>, <span class="dv">195</span>)</span>
+<span id="cb44-8"><a href="#cb44-8" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">190</span>, <span class="dv">200</span>, <span class="dv">190</span>)</span>
+<span id="cb44-9"><a href="#cb44-9" tabindex="-1"></a></span>
+<span id="cb44-10"><a href="#cb44-10" tabindex="-1"></a>S_cl <span class="ot">&lt;-</span> <span class="fu">chain_ladder_bf</span>(S)</span>
+<span id="cb44-11"><a href="#cb44-11" tabindex="-1"></a>S_bf <span class="ot">&lt;-</span> <span class="fu">bf</span>(S, gamma, alpha)</span>
+<span id="cb44-12"><a href="#cb44-12" tabindex="-1"></a><span class="co"># loss development</span></span>
+<span id="cb44-13"><a href="#cb44-13" tabindex="-1"></a><span class="co"># cape-cod</span></span>
+<span id="cb44-14"><a href="#cb44-14" tabindex="-1"></a><span class="co"># additives verfahren</span></span>
+<span id="cb44-15"><a href="#cb44-15" tabindex="-1"></a>S_pa <span class="ot">&lt;-</span> <span class="fu">panning</span>(S)</span>
+<span id="cb44-16"><a href="#cb44-16" tabindex="-1"></a></span>
+<span id="cb44-17"><a href="#cb44-17" tabindex="-1"></a>dreiecke <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb44-18"><a href="#cb44-18" tabindex="-1"></a>  <span class="at">chainladder =</span> S_cl, </span>
+<span id="cb44-19"><a href="#cb44-19" tabindex="-1"></a>  <span class="at">bornhuetter_ferguson =</span> S_bf, </span>
+<span id="cb44-20"><a href="#cb44-20" tabindex="-1"></a>  <span class="at">panning =</span> S_pa</span>
+<span id="cb44-21"><a href="#cb44-21" tabindex="-1"></a>  )</span>
+<span id="cb44-22"><a href="#cb44-22" tabindex="-1"></a></span>
+<span id="cb44-23"><a href="#cb44-23" tabindex="-1"></a>rueckstellung <span class="ot">&lt;-</span> <span class="cf">function</span>(S) {</span>
+<span id="cb44-24"><a href="#cb44-24" tabindex="-1"></a>  last_cols <span class="ot">&lt;-</span> (<span class="fu">ncol</span>(S)<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(<span class="dv">2</span><span class="sc">*</span><span class="fu">ncol</span>(S)<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb44-25"><a href="#cb44-25" tabindex="-1"></a>  X <span class="ot">&lt;-</span> S <span class="sc">|&gt;</span> </span>
+<span id="cb44-26"><a href="#cb44-26" tabindex="-1"></a>    <span class="fu">decum_row</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb44-27"><a href="#cb44-27" tabindex="-1"></a>    <span class="fu">shift_right</span>()</span>
+<span id="cb44-28"><a href="#cb44-28" tabindex="-1"></a>  X[, last_cols] <span class="sc">|&gt;</span> <span class="fu">sum</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb44-29"><a href="#cb44-29" tabindex="-1"></a>}</span>
+<span id="cb44-30"><a href="#cb44-30" tabindex="-1"></a><span class="co"># Übersicht</span></span>
+<span id="cb44-31"><a href="#cb44-31" tabindex="-1"></a>(uebersicht <span class="ot">&lt;-</span> <span class="fu">sapply</span>(dreiecke, rueckstellung))</span></code></pre></div>
+<pre><code>##          chainladder bornhuetter_ferguson              panning 
+##             110.8750              96.0000             118.5902</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a><span class="fu">summary</span>(uebersicht)</span></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    96.0   103.4   110.9   108.5   114.7   118.6</code></pre>
 </div>
 
 

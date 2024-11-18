@@ -200,7 +200,7 @@ compute_sigmas <- function(X, pis) {
 }
 mack <- function(S, pi) {
   X <- S |> decum_row()
-  # Vermutlich ist zeta gemeint, steht aber ς (= sigma im Coda).
+  # Vermutlich ist zeta (ζ) gemeint, steht aber ς (= sigma im Coda).
   sigma_ad <- colSums(X, na.rm = TRUE) / rev(cumsum(pi)) # S. 158
   gamma_ad <- cumsum(sigma_ad) / sum(sigma_ad)           # S. 159
   alpha_ld <- rowSums(X, na.rm = TRUE) / rev(gamma_ad)   # S. 161
@@ -224,52 +224,79 @@ S <- rbind(
   c(NA, 120, 170),
   c(NA, NA, 110)
 ) |> shift_left()
-gamma <- c(0.6, 0.9, 1) # gegeben
-(phi_cl <- phi(S))      # S. 156
-# (gamma_cl <- c(rev(1/cumprod(rev(phi_cl)))[2:length(phi_cl)], 1)) # S. 157
-(gamma_cl <- c((1 / cumprod(rev(phi_cl[2:length(phi_cl)]))) |> rev(), 1))
-(alpha_ld <- rev(apply(S, 1, max, na.rm = TRUE) / rev(gamma_cl))) # S. 161
-X <- bf(S, gamma_cl, alpha_ld) |> 
+chain_ladder_bf <- function(S) {
+  phi_cl <- phi(S) # S. 156
+  gamma_cl <- c((1 / cumprod(rev(phi_cl[2:length(phi_cl)]))) |> rev(), 1) # S. 157
+  alpha_ld <- rev(apply(S, 1, max, na.rm = TRUE) / rev(gamma_cl)) # S. 161
+  bf(S, gamma_cl, alpha_ld)
+}
+X <- chain_ladder_bf(S) |> 
   decum_row() |> 
   shift_right()
 X
 X[, 4:5] |> sum(na.rm = TRUE) # Rückstellungen
-# mit chain_ladder()
-S |> 
-  decum_row() |> 
-  chain_ladder()
-# Ähnlich aber anders, weil gamma vorgegeben war.
+
 
 #' **Panning**
-
-
-# S. 158
-gamma_pa <- function(beta) {
-  cumsum(beta) / sum(beta)
-}
-# S. 157
-beta_pa <- function(X) {
-  ell <- ncol(X)
-  betas <- vector(length = ell)
-  for (i in 1:ell) {
-    betas[i] <- sum(X[1:(ell-i+1), i] * X[1:(ell-i+1), 1]) / sum(X[1:(ell-i+1), 1]^2)
+panning <- function(S) {
+  # S. 158
+  gamma_pa <- function(beta) {
+    cumsum(beta) / sum(beta)
   }
-  betas
+  # S. 157
+  beta_pa <- function(X) {
+    ell <- ncol(X)
+    betas <- vector(length = ell)
+    for (i in 1:ell) {
+      betas[i] <- sum(X[1:(ell-i+1), i] * X[1:(ell-i+1), 1]) / sum(X[1:(ell-i+1), 1]^2)
+    }
+    betas
+  }
+  # S. 164
+  alpha_pa <- function(X) {
+    X[, 1] * sum(beta_pa(X))
+  }
+  bf(S, gamma_pa(beta_pa(decum_row(S))), alpha_pa(decum_row(S)))
 }
-# S. 164
-alpha_pa <- function(X) {
-  X[, 1] * sum(beta_pa(X))
-}
-S |> 
-  decum_row() |> 
-  beta_pa() |> 
-  gamma_pa()
-S |> 
-  decum_row() |> 
-  alpha_pa()
-bf(S, gamma_pa(beta_pa(decum_row(S))), alpha_pa(decum_row(S))) |> 
+
+X <- panning(S) |> 
   decum_row() |> 
   shift_right()
+X
+X[, 4:5] |> sum(na.rm = TRUE) # Rückstellungen
 
 #' # Rückstellungsverfahren mit erweitertem Bornhuetter-Ferguson-Verfahren
-#' Bissl zu mühsam.
+S <- rbind(
+  c(100, 150, 180),
+  c(NA, 120, 170),
+  c(NA, NA, 110)
+) |> shift_left()
+gamma <- c(0.6, 0.9, 1)
+pis <- c(185, 205, 195)
+alpha <- c(190, 200, 190)
+
+S_cl <- chain_ladder_bf(S)
+S_bf <- bf(S, gamma, alpha)
+# loss development
+# cape-cod
+# additives verfahren
+S_pa <- panning(S)
+
+dreiecke <- list(
+  chainladder = S_cl, 
+  bornhuetter_ferguson = S_bf, 
+  panning = S_pa
+  )
+
+rueckstellung <- function(S) {
+  last_cols <- (ncol(S)+1):(2*ncol(S)-1)
+  X <- S |> 
+    decum_row() |> 
+    shift_right()
+  X[, last_cols] |> sum(na.rm = TRUE)
+}
+# Übersicht
+(uebersicht <- sapply(dreiecke, rueckstellung))
+summary(uebersicht)
+
+#' Das 75. Perzentil scheint mir ein gute Kompromiss zu sein.
