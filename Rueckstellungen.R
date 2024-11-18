@@ -109,21 +109,24 @@ chain_ladder <- function(M) {
 #' **Antwort:** Berechne nochmals die $\varphi$-Werte:
 (phis <- M |> shift_left() |> cum_row() |> phi())
 
-#' **Falsch, korrigieren:** Wir erwarten also, dass die Leistungen aus einem bestimmten Monat sich wie 
-#' folgt auf die Folgemonate verteilen (Proportionen):
+#' Es gelten $S_{5,0} \cdot \phi_1 \dots \phi_3 = 1000000$ 
+#' und $S_{6,0} \cdot \phi_1 \dots \phi_3 = 1100000$.
+#' Daraus $S_{5,0} = 124410.1$, $S_{6,0} = 136851.2$.
+#' Daraus dann wieder $S_{5,1} = 124410.1 \cdot \phi_1 = 716645.5$.
+#' Somit $X_{5,1} = 716645.5 - 124410.1 = 592235.4$.
 phis[1] <- 1
-(props <- phis / sum(phis))
+1e6 / prod(phis)
+11e5 / prod(phis)
+1e6 / prod(phis) * cumprod(phis[2:3])
+11e5 / prod(phis) * cumprod(phis[2:3])
 
-#' Folglich werden in Abrechnungsmonat 5 etwa 109'404 der 1'000'000 Kosten 
-#' abgerechnet. (Total mit den Vormonaten: 1'000'666.)
-props[1] * 1e6
-
-#' In Abrechnungsmonat 6 fallen 750'549.1 zusätzliche Kosten an.
-#' (Total mit den Vormonaten: 1'045'132.)
-props[2] * 1e6 + props[1] * 11e5
-
-#' (c) Cf. GLM-Implementierung.
-
+#' Folglich werden im Abrechnungsmonat 5 etwa 124'410 der 1'000'000 Kosten 
+#' abgerechnet. (Total mit den Vormonaten: 1'015'672.)
+#' Im Abrechnungsmonat 6 fallen 136851.2 + 592235.4 = 729087 zusätzliche Kosten an.
+#' (Total mit den Vormonaten: 1'023'670.)
+#' 
+#' (c) Cf. GLM-Implementierung. Siehe S. 169.
+#' 
 #' # Rückstellungen mit Benktander-Hovinen
 #' Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 154
 #' die Rückstellungen gemäss Bornhuetter-Ferguson und gemäss Benktander-Hovinen.
@@ -185,7 +188,6 @@ X <- rbind(
   c(1725, 2536,   NA,  NA,  NA,  NA),
   c(1889,   NA,   NA,  NA,  NA,  NA)
 )
-gamma_ad <- c(0.263, 0.543, 0.709, 0.862, 0.960, 1) # S. 159
 
 # Formel S. 158
 compute_sigmas <- function(X, pis) {
@@ -196,26 +198,27 @@ compute_sigmas <- function(X, pis) {
   }
   sigmas
 }
-mack <- function(S, gamma_ad) {
+mack <- function(S, pi) {
   X <- S |> decum_row()
-  alpha_ld <- rowSums(X, na.rm = TRUE) / rev(gamma_ad) # S. 161
+  # Vermutlich ist zeta gemeint, steht aber ς (= sigma im Coda).
+  sigma_ad <- colSums(X, na.rm = TRUE) / rev(cumsum(pi)) # S. 158
+  gamma_ad <- cumsum(sigma_ad) / sum(sigma_ad)           # S. 159
+  alpha_ld <- rowSums(X, na.rm = TRUE) / rev(gamma_ad)   # S. 161
   sigmas_ad <- compute_sigmas(X, alpha_ld)
-  gamma_mack <- cumsum(sigmas_ad) / sum(sigmas_ad) # S. 159
-  alpha_mack <- alpha_ld * sum(sigmas_ad) # S. 163; verwende alpha_ld für pi
+  gamma_mack <- cumsum(sigmas_ad) / sum(sigmas_ad)       # S. 159
+  alpha_mack <- alpha_ld * sum(sigmas_ad)                # S. 163; verwende alpha_ld für pi
   bf(S, gamma_mack, alpha_mack)
 }
-#' Resultat:
+#' Resultat: Die Gesamtrückstellungen betragen 11'706.
 (S_mack <- X |> 
     cum_row() |> 
-    mack(gamma_ad)) 
+    mack(c(4000, 4500, 5300, 6000, 6900, 8200))) 
 X_mack <- S_mack |> decum_row() |> shift_right()
 X_mack[2:6, 7:11]
-sum(X_mack[2:6, 7:11], na.rm = TRUE) # Gesamtrückstellungen: 11'696
-
-#' **Irgendwo muss ich einen kleinen Fehler gemacht haben. Die tatsächliche Antwort ist 11'706. Vllt. liegt's daran, dass man die $\alpha^{LD}$-Werte genauer berechnen kann.**
+sum(X_mack[2:6, 7:11], na.rm = TRUE) # Gesamtrückstellungen: 11'706
 
 #' # Rückstellungsberechnung mit erweitertem Bornhuetter-Ferguson-Verfahren
-#' **Chain Ladder:**
+#' **Chain Ladder:** Total Rückstellungen: 110.875.
 S <- rbind(
   c(100, 150, 180),
   c(NA, 120, 170),
@@ -223,14 +226,22 @@ S <- rbind(
 ) |> shift_left()
 gamma <- c(0.6, 0.9, 1) # gegeben
 (phi_cl <- phi(S))      # S. 156
-(gamma_cl <- c(rev(1/cumprod(rev(phi_cl)))[2:length(phi_cl)], 1)) # S. 157
-(alpha_ld <- rev(apply(S, 1, max, na.rm = TRUE) / gamma_cl)) # S. 161
-bf(S, gamma_cl, alpha_ld) |> 
+# (gamma_cl <- c(rev(1/cumprod(rev(phi_cl)))[2:length(phi_cl)], 1)) # S. 157
+(gamma_cl <- c((1 / cumprod(rev(phi_cl[2:length(phi_cl)]))) |> rev(), 1))
+(alpha_ld <- rev(apply(S, 1, max, na.rm = TRUE) / rev(gamma_cl))) # S. 161
+X <- bf(S, gamma_cl, alpha_ld) |> 
   decum_row() |> 
   shift_right()
-#' Auch hier irgendwo noch ein Fehler zu korrigieren.
+X
+X[, 4:5] |> sum(na.rm = TRUE) # Rückstellungen
+# mit chain_ladder()
+S |> 
+  decum_row() |> 
+  chain_ladder()
+# Ähnlich aber anders, weil gamma vorgegeben war.
 
 #' **Panning**
+
 
 # S. 158
 gamma_pa <- function(beta) {
