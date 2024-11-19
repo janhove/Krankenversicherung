@@ -56,7 +56,7 @@ phi <- function(S) {
   phis
 }
 # Formel S. 152
-fill_in <- function(S) {
+chain_ladder <- function(S) {
   phis <- phi(S)
   ell <- ncol(S)
   for (row in 1:ell) {
@@ -90,23 +90,24 @@ shift_right <- function(M) {
   rownames(M_shifted) <- 1:ell
   M_shifted
 }
-chain_ladder <- function(M) {
-  M |> 
-    shift_left() |> 
-    cum_row() |> 
-    fill_in() |> 
+rueckstellung <- function(S) {
+  last_cols <- (ncol(S)+1):(2*ncol(S)-1)
+  X <- S |> 
     decum_row() |> 
     shift_right()
+  X[, last_cols] |> sum(na.rm = TRUE)
 }
-#' Resultat:
-(M_cl <- chain_ladder(M))
+#' Resultat: Der Rückstellungsbedarf laut chain ladder beträgt 1'231'886.
+(S_cl <- M |> shift_left() |> cum_row() |> chain_ladder())
+(S_cl |> decum_row() |> shift_right())
+rueckstellung(S_cl)
 
 #' (b) Angenommen, in den darauf folgenden Behandlungsmonaten 5 und 6
 #' fallen Leistung von total 1'000'000 bzw. 1'100'000 an. Das Abwicklungsmuster
 #' bleibe dasselbe wie in den vorangehenden Monaten 1 bis 4.
 #' Wie viele Leistungen werden in den Abrechnungsmonaten 5 und 6 abgerechnet.
 #' 
-#' **Antwort:** Berechne nochmals die $\varphi$-Werte:
+#' Antwort: Berechne nochmals die $\varphi$-Werte:
 (phis <- M |> shift_left() |> cum_row() |> phi())
 
 #' Es gelten $S_{5,0} \cdot \phi_1 \dots \phi_3 = 1000000$ 
@@ -122,7 +123,7 @@ phis[1] <- 1
 
 #' Folglich werden im Abrechnungsmonat 5 etwa 124'410 der 1'000'000 Kosten 
 #' abgerechnet. (Total mit den Vormonaten: 1'015'672.)
-#' Im Abrechnungsmonat 6 fallen 136851.2 + 592235.4 = 729087 zusätzliche Kosten an.
+#' Im Abrechnungsmonat 6 fallen 136'851.2 + 592'235.4 = 729'087 zusätzliche Kosten an.
 #' (Total mit den Vormonaten: 1'023'670.)
 #' 
 #' (c) Cf. GLM-Implementierung. Siehe S. 169.
@@ -131,10 +132,12 @@ phis[1] <- 1
 #' Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 154
 #' die Rückstellungen gemäss Bornhuetter-Ferguson und gemäss Benktander-Hovinen.
 #' 
-#' **Antwort:** Tabelle 8w (S. 160) enthält bereits die kumulativen Rückstellungen.
+#' Tabelle 8w (S. 160) enthält bereits die kumulativen Rückstellungen.
 #' Es reicht also, diese zu dekumulieren. Für Benktander-Hovinen kann man
 #' den Bornhuetter-Ferguson-Algorithmus rezyklieren und lediglich die $\alpha$-Werte
 #' anpassen.
+#' 
+#' Die Gesamtrückstellungen betragen 9'964.
 
 S <- rbind(
   c(0,       0,    0,    0,    0, 3483),
@@ -144,9 +147,7 @@ S <- rbind(
   c(0,    4261, 5379, 6310, 6869, 7180),
   c(1889, 3472, 4611, 5560, 6130, 6447)
 )
-X <- S |> decum_row() |> shift_right()
-X[2:6, 7:11]
-sum(X[2:6, 7:11], na.rm = TRUE) # Gesamtrückstellungen: 9'964
+rueckstellung(S) # Gesamtrückstellungen: 9'964
 
 #' Bornhuetter-Ferguson-Algorithmus definieren. (S. 160)
 bf <- function(S, gamma, alpha) {
@@ -165,15 +166,13 @@ alpha <- c(3520, 3980, 4620, 5660, 6210, 6330)
 bf(S, gamma, alpha) # Stimmt
 
 #' Für den Benktander-Hovinen-Algorithmus muss man lediglich die $\alpha$-Werte
-#' anders berechnen, S. 166. Ich erhalte die 
+#' anders berechnen, S. 166. Ich erhalte einen Rückstellungsbedarf von 10'467.
 bh <- function(S, gamma, alpha) {
   alpha_bf <- bf(S, gamma, alpha)[, ncol(S)]
   bf(S, gamma, alpha_bf)
 }
 (S_bh <- bh(S, gamma, alpha))
-X <- S_bh |> decum_row() |> shift_right()
-X[2:6, 7:11]
-sum(X[2:6, 7:11], na.rm = TRUE) # Gesamtrückstellungen: 10'467
+rueckstellung(S_bh)
 
 #' # Rückstellungen nach Mack's Methode
 #' Berechnen Sie ausgehend vom Zahlenbeispiel auf S. 159 (Tabelle 8t)
@@ -190,6 +189,7 @@ X <- rbind(
 )
 
 # Formel S. 158
+# (Vermutlich ist zeta (ζ) gemeint, steht aber ς (= Variante von sigma).)
 compute_sigmas <- function(X, pis) {
   ell <- ncol(X)
   sigmas <- rep(0, ell)
@@ -200,7 +200,6 @@ compute_sigmas <- function(X, pis) {
 }
 mack <- function(S, pi) {
   X <- S |> decum_row()
-  # Vermutlich ist zeta (ζ) gemeint, steht aber ς (= sigma im Coda).
   sigma_ad <- colSums(X, na.rm = TRUE) / rev(cumsum(pi)) # S. 158
   gamma_ad <- cumsum(sigma_ad) / sum(sigma_ad)           # S. 159
   alpha_ld <- rowSums(X, na.rm = TRUE) / rev(gamma_ad)   # S. 161
@@ -213,12 +212,10 @@ mack <- function(S, pi) {
 (S_mack <- X |> 
     cum_row() |> 
     mack(c(4000, 4500, 5300, 6000, 6900, 8200))) 
-X_mack <- S_mack |> decum_row() |> shift_right()
-X_mack[2:6, 7:11]
-sum(X_mack[2:6, 7:11], na.rm = TRUE) # Gesamtrückstellungen: 11'706
+rueckstellung(S_mack)
 
 #' # Rückstellungsberechnung mit erweitertem Bornhuetter-Ferguson-Verfahren
-#' **Chain Ladder:** Total Rückstellungen: 110.875.
+#' **Chain Ladder:** Rückstellungsbedarf: 111.
 S <- rbind(
   c(100, 150, 180),
   c(NA, 120, 170),
@@ -230,14 +227,9 @@ chain_ladder_bf <- function(S) {
   alpha_ld <- rev(apply(S, 1, max, na.rm = TRUE) / rev(gamma_cl)) # S. 161
   bf(S, gamma_cl, alpha_ld)
 }
-X <- chain_ladder_bf(S) |> 
-  decum_row() |> 
-  shift_right()
-X
-X[, 4:5] |> sum(na.rm = TRUE) # Rückstellungen
+S |> chain_ladder_bf() |> rueckstellung()
 
-
-#' **Panning**
+#' **Panning:** Rückstellungsbedarf: 119.
 panning <- function(S) {
   # S. 158
   gamma_pa <- function(beta) {
@@ -258,14 +250,55 @@ panning <- function(S) {
   }
   bf(S, gamma_pa(beta_pa(decum_row(S))), alpha_pa(decum_row(S)))
 }
-
-X <- panning(S) |> 
-  decum_row() |> 
-  shift_right()
-X
-X[, 4:5] |> sum(na.rm = TRUE) # Rückstellungen
+S |> panning() |> rueckstellung()
 
 #' # Rückstellungsverfahren mit erweitertem Bornhuetter-Ferguson-Verfahren
+#' Zunächst weitere Funktionen definieren.
+
+loss_dev <- function(S, gamma) {
+  alpha_ld <- apply(S, 1, max, na.rm = TRUE) / rev(gamma)
+  bf(S, gamma, alpha_ld)
+}
+X <- rbind(
+  c(1001,  854,  568, 565, 347, 148),
+  c(1113,  990,  671, 648, 422,  NA),
+  c(1265, 1168,  800, 744,  NA,  NA),
+  c(1490, 1383, 1007,  NA,  NA,  NA),
+  c(1725, 2536,   NA,  NA,  NA,  NA),
+  c(1889,   NA,   NA,  NA,  NA,  NA)
+)
+X |> 
+  shift_left() |> 
+  cum_row() |> 
+  loss_dev(c(0.28, 0.53, 0.71, 0.86, 0.95, 1)) # OK
+
+additiv <- function(S, pis) {
+  X <- S |> 
+    decum_row()
+  sigma_ad <- colSums(X, na.rm = TRUE) / rev(cumsum(pis)) # S. 158
+  gamma_ad <- cumsum(sigma_ad) / sum(sigma_ad) # S. 159
+  alpha_ad <- pis * sum(sigma_ad)
+  bf(S, gamma_ad, alpha_ad)
+}
+
+X |> 
+  shift_left() |> 
+  cum_row() |> 
+  additiv(c(4000, 4500, 5300, 6000, 6900, 8200)) |> 
+  decum_row() # ok
+
+cape_cod <- function(S, gamma, pis) {
+  kappa_cc <- sum(apply(S, 1, max, na.rm = TRUE)) / sum(rev(gamma) * pis)
+  alpha_cc <- pis * kappa_cc
+  bf(S, gamma, alpha_cc)
+}
+X |> 
+  shift_left() |> 
+  cum_row() |> 
+  cape_cod(c(0.28, 0.53, 0.71, 0.86, 0.95, 1),
+           c(4000, 4500, 5300, 6000, 6900, 8200)) # OK
+
+#' Zur Sache:
 S <- rbind(
   c(100, 150, 180),
   c(NA, 120, 170),
@@ -275,28 +308,32 @@ gamma <- c(0.6, 0.9, 1)
 pis <- c(185, 205, 195)
 alpha <- c(190, 200, 190)
 
-S_cl <- chain_ladder_bf(S)
+S_cl <- chain_ladder(S)
+S_cl_bf <- chain_ladder_bf(S)
 S_bf <- bf(S, gamma, alpha)
-# loss development
-# cape-cod
-# additives verfahren
+S_bh <- bh(S, gamma, alpha)
+S_mack <- mack(S, pi)
+S_ld <- loss_dev(S, gamma)
+S_cc <- cape_cod(S, gamma, pis)
+S_ad <- additiv(S, pis)
 S_pa <- panning(S)
 
 dreiecke <- list(
-  chainladder = S_cl, 
-  bornhuetter_ferguson = S_bf, 
+  chainladder = S_cl,
+  chainladder_bf = S_cl_bf, 
+  bornhuetter_ferguson = S_bf,
+  benktander_hovinen = S_bh,
+  mack = S_mack,
+  loss_dev = S_ld,
+  cape_cod = S_cc,
+  additiv = S_ad,
   panning = S_pa
-  )
+)
 
-rueckstellung <- function(S) {
-  last_cols <- (ncol(S)+1):(2*ncol(S)-1)
-  X <- S |> 
-    decum_row() |> 
-    shift_right()
-  X[, last_cols] |> sum(na.rm = TRUE)
-}
 # Übersicht
 (uebersicht <- sapply(dreiecke, rueckstellung))
+dotchart(sort(uebersicht),
+         xlab = "Rückstellungen")
 summary(uebersicht)
 
-#' Das 75. Perzentil scheint mir ein gute Kompromiss zu sein.
+#' Das 75. Perzentil (115) scheint mir ein gutes Kompromiss zu sein.
