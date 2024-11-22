@@ -55,8 +55,8 @@ sum(bestand_B * ausgleich)
 #' |----------------	|------------:	|---------:	|------------------------:	|
 #' | Risikoklasse A1 	| $50 \times 10^6$  	| $80 \times 10^3$| $625$                       	|
 #' | Risikoklasse A2 	| $100 \times 10^6$  	| $20 \times 10^3$| $5000$                       	|
-#' | Risikoklasse B 	| $30 \times 10^6$   | $40 \times 10^3$ | $750$                       	|
-#' | Risikoklasse A1 	| $75 \times 10^6$  	| $10 \times 10^3$| $7500$                       	|
+#' | Risikoklasse B1 	| $30 \times 10^6$   | $40 \times 10^3$ | $750$                       	|
+#' | Risikoklasse B2 	| $75 \times 10^6$  	| $10 \times 10^3$| $7500$                       	|
 #' | Total          	| $225 \times 10^6$   | $150 \times 10^3$  | $1700$                       	|
 #'
 #' | Kasse 2, neu   	| Leistungen 	| Bestand 	| Durchschnittsleitungen 	|

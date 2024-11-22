@@ -31,13 +31,14 @@ M <- rbind(
 #' die zusammen den Chain-Ladder-Algorithmus bilden.
 #' Dieser Algorithmus wird auf S. 150ff. erklärt.
 
-shift_row_left <- function(row) {
-  if (!is.na(row[[1]])) {
-    return(row)
-  }
-  shift_row_left(c(row[-1], NA))
-}
+
 shift_left <- function(M) {
+  shift_row_left <- function(row) {
+    if (!is.na(row[[1]])) {
+      return(row)
+    }
+    shift_row_left(c(row[-1], NA))
+  }
   for (i in 1:nrow(M)) {
     M[i, ] <- shift_row_left(M[i, ])
   }
@@ -46,17 +47,17 @@ shift_left <- function(M) {
 cum_row <- function(M) {
   apply(M, 1, cumsum) |> t()
 }
-# Formel S. 151
-phi <- function(S) {
-  ell <- ncol(S)
-  phis <- rep(NA, ell)
-  for (i in 2:ell) {
-    phis[i] <- sum(S[1:(ell-i+1), i]) / sum(S[1:(ell-i+1), i-1])
+
+chain_ladder <- function(S) { # Formel S. 152
+  # Formel S. 151
+  phi <- function(S) {
+    ell <- ncol(S)
+    phis <- rep(NA, ell)
+    for (i in 2:ell) {
+      phis[i] <- sum(S[1:(ell-i+1), i]) / sum(S[1:(ell-i+1), i-1])
+    }
+    phis
   }
-  phis
-}
-# Formel S. 152
-chain_ladder <- function(S) {
   phis <- phi(S)
   ell <- ncol(S)
   for (row in 1:ell) {
