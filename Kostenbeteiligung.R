@@ -149,14 +149,14 @@ d <- read_table("serie-241108_aufgabe-3.txt") |>
     prop_erkr = decum(cum_prop_erkr),
     avg_kosten = case_when(
       kostenklasse == 40000 ~ 40000,
-      .default = (2*kostenklasse + 100)/2
+      .default = (2*kostenklasse - 100)/2
     )) 
 
-#' (a) Der Kobeanteil beträgt 16% des Leistungsvolumens.
+#' (a) Der Kobeanteil beträgt 15.7% des Leistungsvolumens.
 kobe_anteil(d$prop_erkr, d$avg_kosten, 400, 0.1, 700)
-#' (b) Der Kobeanteil steigt um 2 Prozentpunkte auf 18% des Leistungsvolumens.
+#' (b) Der Kobeanteil steigt um etwa 2 Prozentpunkte auf 17.6% des Leistungsvolumens.
 kobe_anteil(d$prop_erkr, d$avg_kosten, 500, 0.1, 700)
-#' (c) Der Kobeanteil steigt um 2.5 Prozentpunkte auf 18.5% des Leistungsvolumens.
+#' (c) Der Kobeanteil steigt um etwa 2.4 Prozentpunkte auf 18.2% des Leistungsvolumens.
 kobe_anteil(d$prop_erkr, d$avg_kosten, 400, 0.2, 700)
-#' (d) Der Kobeanteil senkt um einen Prozentpunkt auf 15% des Leistungsvolumens.
+#' (d) Der Kobeanteil senkt um einen Prozentpunkt auf 14.7% des Leistungsvolumens.
 kobe_anteil(d$prop_erkr, 1.1 * d$avg_kosten, 400, 0.1, 700)

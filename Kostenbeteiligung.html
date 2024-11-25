@@ -11,7 +11,7 @@
 
 <meta name="author" content="Jan Vanhove" />
 
-<meta name="date" content="2024-11-18" />
+<meta name="date" content="2024-11-25" />
 
 <title>Aufgabenserie Kostenbeteiligung</title>
 
@@ -2835,7 +2835,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Aufgabenserie Kostenbeteiligung</h1>
 <h4 class="author">Jan Vanhove</h4>
-<h4 class="date">2024-11-18</h4>
+<h4 class="date">2024-11-25</h4>
 
 </div>
 
@@ -3133,7 +3133,7 @@ Kobeanteil: 35%. Rabatt: 30%.</li>
 <span id="cb55-7"><a href="#cb55-7" tabindex="-1"></a>    <span class="at">prop_erkr =</span> <span class="fu">decum</span>(cum_prop_erkr),</span>
 <span id="cb55-8"><a href="#cb55-8" tabindex="-1"></a>    <span class="at">avg_kosten =</span> <span class="fu">case_when</span>(</span>
 <span id="cb55-9"><a href="#cb55-9" tabindex="-1"></a>      kostenklasse <span class="sc">==</span> <span class="dv">40000</span> <span class="sc">~</span> <span class="dv">40000</span>,</span>
-<span id="cb55-10"><a href="#cb55-10" tabindex="-1"></a>      <span class="at">.default =</span> (<span class="dv">2</span><span class="sc">*</span>kostenklasse <span class="sc">+</span> <span class="dv">100</span>)<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb55-10"><a href="#cb55-10" tabindex="-1"></a>      <span class="at">.default =</span> (<span class="dv">2</span><span class="sc">*</span>kostenklasse <span class="sc">-</span> <span class="dv">100</span>)<span class="sc">/</span><span class="dv">2</span></span>
 <span id="cb55-11"><a href="#cb55-11" tabindex="-1"></a>    )) </span></code></pre></div>
 <pre><code>## 
 ## ── Column specification ────────────────────────────────────────────────────────
@@ -3142,28 +3142,28 @@ Kobeanteil: 35%. Rabatt: 30%.</li>
 ##   anteil_erkr = col_character()
 ## )</code></pre>
 <ol style="list-style-type: lower-alpha">
-<li>Der Kobeanteil beträgt 16% des Leistungsvolumens.</li>
+<li>Der Kobeanteil beträgt 15.7% des Leistungsvolumens.</li>
 </ol>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a><span class="fu">kobe_anteil</span>(d<span class="sc">$</span>prop_erkr, d<span class="sc">$</span>avg_kosten, <span class="dv">400</span>, <span class="fl">0.1</span>, <span class="dv">700</span>)</span></code></pre></div>
-<pre><code>## [1] 0.1601655</code></pre>
+<pre><code>## [1] 0.1568993</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
-<li>Der Kobeanteil steigt um 2 Prozentpunkte auf 18% des
+<li>Der Kobeanteil steigt um etwa 2 Prozentpunkte auf 17.6% des
 Leistungsvolumens.</li>
 </ol>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a><span class="fu">kobe_anteil</span>(d<span class="sc">$</span>prop_erkr, d<span class="sc">$</span>avg_kosten, <span class="dv">500</span>, <span class="fl">0.1</span>, <span class="dv">700</span>)</span></code></pre></div>
-<pre><code>## [1] 0.1799653</code></pre>
+<pre><code>## [1] 0.1761445</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
-<li>Der Kobeanteil steigt um 2.5 Prozentpunkte auf 18.5% des
+<li>Der Kobeanteil steigt um etwa 2.4 Prozentpunkte auf 18.2% des
 Leistungsvolumens.</li>
 </ol>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a><span class="fu">kobe_anteil</span>(d<span class="sc">$</span>prop_erkr, d<span class="sc">$</span>avg_kosten, <span class="dv">400</span>, <span class="fl">0.2</span>, <span class="dv">700</span>)</span></code></pre></div>
-<pre><code>## [1] 0.185475</code></pre>
+<pre><code>## [1] 0.1816991</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
-<li>Der Kobeanteil senkt um einen Prozentpunkt auf 15% des
+<li>Der Kobeanteil senkt um einen Prozentpunkt auf 14.7% des
 Leistungsvolumens.</li>
 </ol>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a><span class="fu">kobe_anteil</span>(d<span class="sc">$</span>prop_erkr, <span class="fl">1.1</span> <span class="sc">*</span> d<span class="sc">$</span>avg_kosten, <span class="dv">400</span>, <span class="fl">0.1</span>, <span class="dv">700</span>)</span></code></pre></div>
-<pre><code>## [1] 0.1504632</code></pre>
+<pre><code>## [1] 0.1473887</code></pre>
 </div>
 
 
